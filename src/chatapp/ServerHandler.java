@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mychatapp;
+package chatapp;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -26,8 +26,5 @@ public class ServerHandler extends MessageHandler{
        return server.accept();
     }
     
-    public String getLocalIp()
-    {
-        return server.getInetAddress().toString();
-    }
+   
 }

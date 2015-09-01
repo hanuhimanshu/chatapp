@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mychatapp;
+package chatapp;
 
 import java.io.IOException;
 import java.io.*;
@@ -18,28 +18,19 @@ public abstract class MessageHandler {
     private Socket file_socket;
     private IOStreamConnecter io_stream_connecter;
     private BufferedReader message_reader;
-    private BufferedWriter message_writer;
+    private PrintWriter message_writer;
     public static final int TYPE_MESSAGE=0;
     public static final int TYPE_FILE=1;
     public void sendMessage(String message) throws IOException
     {
-        message_writer.write("msg:"+message);
+        message_writer.println("msg:"+message);
         message_writer.flush();
     }
     
-    public int receiveMessageInto(String message) throws IOException
+    public String receiveMessage() throws IOException
     {
-        message=message_reader.readLine();
-        if(message.startsWith("msg:"))
-        {
-            message=message.substring(4);
-            return TYPE_MESSAGE;
-        }
-        else
-        {
-            message=message.substring(5);
-            return TYPE_FILE;
-        }
+        return message_reader.readLine();
+        
     }
     
     public void receiveFile(String file_info,File path) throws IOException
@@ -63,6 +54,7 @@ public abstract class MessageHandler {
     
     public void sendFile(File file) throws IOException
     {
+        message_writer.println("file:"+file.getName()+":"+file.length());
         file_socket=getFileSocket();
         io_stream_connecter=new IOStreamConnecter(new FileInputStream(file),file_socket.getOutputStream());
         io_stream_connecter.connect();
@@ -76,11 +68,15 @@ public abstract class MessageHandler {
     public MessageHandler(Socket message_socket) throws IOException {
         this.message_socket = message_socket;
         message_reader=new BufferedReader(new InputStreamReader(message_socket.getInputStream()));
-        message_writer=new BufferedWriter(new OutputStreamWriter(message_socket.getOutputStream()));
+        message_writer=new PrintWriter((message_socket.getOutputStream()));
     }
 
-    protected Socket getMessage_socket() {
+    public Socket getMessage_socket() {
         return message_socket;
     }
     
+    public String getLocalIp()
+    {
+        return message_socket.getInetAddress().toString();
+    }
 }
